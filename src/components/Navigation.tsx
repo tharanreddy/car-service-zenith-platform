@@ -5,9 +5,11 @@ import { Car, LogOut } from 'lucide-react';
 interface NavigationProps {
   currentPage: string;
   onNavigate: (page: string) => void;
+  onLogout: () => void;
+  userEmail: string;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate }) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate, onLogout, userEmail }) => {
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'book-service', label: 'Book Service' },
@@ -40,10 +42,13 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
             ))}
           </div>
 
-          <Button variant="outline" size="sm">
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground hidden md:block">{userEmail}</span>
+            <Button variant="outline" size="sm" onClick={onLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     </nav>

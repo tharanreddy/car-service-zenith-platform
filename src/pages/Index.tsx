@@ -7,6 +7,7 @@ import { Feedback } from '@/components/Feedback';
 import { Contact } from '@/components/Contact';
 import { Profile } from '@/components/Profile';
 import { Chat } from '@/components/Chat';
+import { Auth } from '@/components/Auth';
 
 export type UserProfile = {
   name: string;
@@ -31,6 +32,7 @@ export type BookingData = {
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('home');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: '',
     email: '',
@@ -43,6 +45,32 @@ const Index = () => {
   });
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
+
+  const handleAuthSuccess = (user: { name: string; email: string }) => {
+    setUserProfile(prev => ({
+      ...prev,
+      name: user.name,
+      email: user.email,
+    }));
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserProfile({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      carMake: '',
+      carModel: '',
+      carYear: '',
+      licensePlate: '',
+    });
+    setBookingData(null);
+    setPaymentData(null);
+    setCurrentPage('home');
+  };
 
   const updateProfileFromBooking = (booking: BookingData) => {
     setBookingData(booking);
@@ -76,9 +104,18 @@ const Index = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return <Auth onAuthSuccess={handleAuthSuccess} />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Navigation 
+        currentPage={currentPage} 
+        onNavigate={setCurrentPage} 
+        onLogout={handleLogout}
+        userEmail={userProfile.email}
+      />
       {renderCurrentPage()}
     </div>
   );
