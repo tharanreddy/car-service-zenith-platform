@@ -2,41 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* QuickCar Design System - Automotive Service Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core brand colors */
+    --background: 210 20% 98%;
+    --foreground: 210 20% 15%;
 
+    /* Card colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 15%;
 
+    /* Popover colors */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 20% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary automotive blue */
+    --primary: 200 80% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 200 80% 40%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Success green for confirmations */
+    --success: 140 70% 45%;
+    --success-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Secondary colors */
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 210 20% 25%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Muted colors */
+    --muted: 210 20% 95%;
+    --muted-foreground: 210 15% 50%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Accent colors */
+    --accent: 190 70% 90%;
+    --accent-foreground: 200 80% 30%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Status colors */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --warning: 45 90% 55%;
+    --warning-foreground: 45 30% 15%;
+
+    /* Border and input */
+    --border: 210 20% 85%;
+    --input: 210 20% 90%;
+    --ring: 200 80% 45%;
+
+    /* Design tokens */
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(200 80% 45%), hsl(190 70% 50%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 20% 98%));
+    --gradient-button: linear-gradient(135deg, hsl(200 80% 45%), hsl(200 80% 50%));
+    
+    /* Shadows */
+    --shadow-card: 0 4px 20px hsl(200 80% 45% / 0.1);
+    --shadow-button: 0 4px 15px hsl(200 80% 45% / 0.3);
+    --shadow-hover: 0 8px 30px hsl(200 80% 45% / 0.2);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
