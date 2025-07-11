@@ -29,6 +29,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
     preferredTime: '',
   });
   const [date, setDate] = useState<Date>();
+  const [customService, setCustomService] = useState('');
 
   const handleInputChange = (field: keyof BookingData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -60,13 +61,13 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
   };
 
   const serviceTypes = [
-    "Oil Change",
-    "Brake Service",
-    "Engine Diagnostic",
-    "Tire Rotation", 
-    "Battery Replacement",
-    "AC Service",
-    "Full Service"
+    "Basic Service",
+    "Full Service", 
+    "Engine Repair",
+    "Wheel Alignment",
+    "Car Wash",
+    "Denting & Painting",
+    "Other"
   ];
 
   const timeSlots = [
@@ -129,7 +130,10 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
 
               <div className="space-y-2">
                 <Label>Select Service Type</Label>
-                <Select onValueChange={(value) => handleInputChange('serviceType', value)} required>
+                <Select onValueChange={(value) => {
+                  handleInputChange('serviceType', value);
+                  if (value !== 'Other') setCustomService('');
+                }} required>
                   <SelectTrigger>
                     <SelectValue placeholder="-- Choose Service --" />
                   </SelectTrigger>
@@ -141,6 +145,17 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                     ))}
                   </SelectContent>
                 </Select>
+                {formData.serviceType === 'Other' && (
+                  <Input
+                    placeholder="Please specify your service requirement"
+                    value={customService}
+                    onChange={(e) => {
+                      setCustomService(e.target.value);
+                      handleInputChange('serviceType', `Other: ${e.target.value}`);
+                    }}
+                    className="mt-2"
+                  />
+                )}
               </div>
 
               <div className="space-y-2">

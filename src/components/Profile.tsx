@@ -147,21 +147,6 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
           </Card>
         </div>
 
-        {/* Service History (placeholder) */}
-        <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm mt-8">
-          <CardHeader>
-            <CardTitle>Recent Service History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <Car className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No service history yet.</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Your completed services will appear here.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

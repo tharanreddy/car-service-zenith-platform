@@ -33,6 +33,7 @@ export type BookingData = {
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [registeredUsers, setRegisteredUsers] = useState<Array<{email: string, password: string, name: string}>>([]);
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: '',
     email: '',
@@ -55,6 +56,20 @@ const Index = () => {
     setIsAuthenticated(true);
   };
 
+  const handleRegister = (userData: { name: string; email: string; password: string }) => {
+    setRegisteredUsers(prev => [...prev, userData]);
+    handleAuthSuccess({ name: userData.name, email: userData.email });
+  };
+
+  const handleLogin = (email: string, password: string) => {
+    const user = registeredUsers.find(u => u.email === email && u.password === password);
+    if (user) {
+      handleAuthSuccess({ name: user.name, email: user.email });
+      return true;
+    }
+    return false;
+  };
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUserProfile({
@@ -71,6 +86,15 @@ const Index = () => {
     setPaymentData(null);
     setCurrentPage('home');
   };
+
+  // Handle navigation to booking from payment
+  React.useEffect(() => {
+    const handleNavigateToBooking = () => {
+      setCurrentPage('book-service');
+    };
+    window.addEventListener('navigate-to-booking', handleNavigateToBooking);
+    return () => window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
+  }, []);
 
   const updateProfileFromBooking = (booking: BookingData) => {
     setBookingData(booking);
@@ -105,7 +129,7 @@ const Index = () => {
   };
 
   if (!isAuthenticated) {
-    return <Auth onAuthSuccess={handleAuthSuccess} />;
+    return <Auth onAuthSuccess={handleAuthSuccess} onRegister={handleRegister} onLogin={handleLogin} />;
   }
 
   return (

@@ -30,7 +30,11 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
                 Please complete your service booking first before proceeding to payment.
               </p>
               <Button 
-                onClick={() => window.location.reload()}
+                onClick={() => {
+                  // Navigate back to booking section
+                  const event = new CustomEvent('navigate-to-booking');
+                  window.dispatchEvent(event);
+                }}
                 variant="default" 
                 size="lg"
               >

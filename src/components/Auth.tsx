@@ -9,9 +9,11 @@ import { toast } from '@/hooks/use-toast';
 
 interface AuthProps {
   onAuthSuccess: (user: { name: string; email: string }) => void;
+  onRegister: (userData: { name: string; email: string; password: string }) => void;
+  onLogin: (email: string, password: string) => boolean;
 }
 
-export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
+export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, onRegister, onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({
@@ -32,12 +34,19 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       return;
     }
     
-    // Simulate login
-    toast({
-      title: "Login Successful",
-      description: "Welcome back!",
-    });
-    onAuthSuccess({ name: "User", email: loginData.email });
+    const loginSuccess = onLogin(loginData.email, loginData.password);
+    if (loginSuccess) {
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to QuickCar!",
+      });
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password. Please register first if you don't have an account.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleRegister = (e: React.FormEvent) => {
@@ -60,11 +69,15 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       return;
     }
     
+    onRegister({
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password
+    });
     toast({
       title: "Registration Successful",
       description: "Welcome to QuickCar!",
     });
-    onAuthSuccess({ name: registerData.name, email: registerData.email });
   };
 
   return (
