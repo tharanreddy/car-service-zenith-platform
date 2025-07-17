@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,14 +6,30 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import type { UserProfile } from '@/pages/Index';
 
-export const Contact: React.FC = () => {
+interface ContactProps {
+  userProfile?: UserProfile;
+}
+
+export const Contact: React.FC<ContactProps> = ({ userProfile }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
+
+  // Auto-populate from user profile
+  useEffect(() => {
+    if (userProfile) {
+      setFormData(prev => ({
+        ...prev,
+        name: userProfile.name || '',
+        email: userProfile.email || ''
+      }));
+    }
+  }, [userProfile]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

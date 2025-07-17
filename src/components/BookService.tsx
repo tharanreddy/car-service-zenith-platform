@@ -108,13 +108,24 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                   type="tel"
                   value={formData.contactNumber}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow numbers and common phone characters
-                    if (/^[0-9+\-\s()]*$/.test(value)) {
+                    let value = e.target.value;
+                    // Remove all non-digit characters except +, -, space, and parentheses
+                    value = value.replace(/[^0-9+\-\s()]/g, '');
+                    
+                    // Limit to reasonable phone number length
+                    if (value.length <= 17) {
+                      // Auto-format for common patterns
+                      if (value.startsWith('+91') && value.length > 3) {
+                        // Indian format: +91 XXXXX XXXXX
+                        value = value.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2 $3');
+                      } else if (value.startsWith('+1') && value.length > 2) {
+                        // US format: +1 (XXX) XXX-XXXX
+                        value = value.replace(/(\+1)(\d{3})(\d{3})(\d{4})/, '$1 ($2) $3-$4');
+                      }
                       handleInputChange('contactNumber', value);
                     }
                   }}
-                  placeholder="Enter your phone number (e.g., +91 9876543210)"
+                  placeholder="e.g., +91 98765 43210 or +1 (555) 123-4567"
                   required
                 />
               </div>
@@ -159,13 +170,14 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                 </Select>
                 {formData.serviceType === 'Other' && (
                   <Input
-                    placeholder="Please specify your service requirement"
+                    placeholder="Type anything - describe your specific service needs"
                     value={customService}
                     onChange={(e) => {
                       setCustomService(e.target.value);
                       handleInputChange('serviceType', `Other: ${e.target.value}`);
                     }}
                     className="mt-2"
+                    required
                   />
                 )}
               </div>
