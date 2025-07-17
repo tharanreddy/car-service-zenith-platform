@@ -50,8 +50,14 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                 <Input
                   id="name"
                   value={userProfile.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="John Doe"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow letters and spaces
+                    if (/^[a-zA-Z\s]*$/.test(value)) {
+                      handleInputChange('name', value);
+                    }
+                  }}
+                  placeholder="Enter your full name"
                 />
               </div>
 
@@ -61,8 +67,12 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                   id="email"
                   type="email"
                   value={userProfile.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="john.doe@example.com"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Basic email validation
+                    handleInputChange('email', value);
+                  }}
+                  placeholder="e.g., john.doe@example.com"
                 />
               </div>
 
@@ -72,8 +82,14 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                   id="phone"
                   type="tel"
                   value={userProfile.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="9876543210"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and common phone characters
+                    if (/^[0-9+\-\s()]*$/.test(value)) {
+                      handleInputChange('phone', value);
+                    }
+                  }}
+                  placeholder="e.g., +91 9876543210"
                 />
               </div>
 

@@ -89,7 +89,13 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow letters and spaces
+                    if (/^[a-zA-Z\s]*$/.test(value)) {
+                      handleInputChange('name', value);
+                    }
+                  }}
                   placeholder="Enter your full name"
                   required
                 />
@@ -101,8 +107,14 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                   id="contact"
                   type="tel"
                   value={formData.contactNumber}
-                  onChange={(e) => handleInputChange('contactNumber', e.target.value)}
-                  placeholder="Enter your phone number"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Only allow numbers and common phone characters
+                    if (/^[0-9+\-\s()]*$/.test(value)) {
+                      handleInputChange('contactNumber', value);
+                    }
+                  }}
+                  placeholder="Enter your phone number (e.g., +91 9876543210)"
                   required
                 />
               </div>
@@ -178,6 +190,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                       mode="single"
                       selected={date}
                       onSelect={setDate}
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       initialFocus
                       className="pointer-events-auto"
                     />

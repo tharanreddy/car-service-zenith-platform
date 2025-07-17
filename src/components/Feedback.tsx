@@ -13,6 +13,7 @@ export const Feedback: React.FC = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [comments, setComments] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [userFeedbacks, setUserFeedbacks] = useState<Array<{serviceId: string, rating: number, comments: string}>>([]);
 
   const testimonials = [
     {
@@ -53,6 +54,8 @@ export const Feedback: React.FC = () => {
       return;
     }
 
+    // Add the feedback to the list
+    setUserFeedbacks(prev => [...prev, { serviceId, rating, comments }]);
     setSubmitted(true);
     toast({
       title: "Feedback Submitted!",
@@ -142,6 +145,35 @@ export const Feedback: React.FC = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* User Feedback Display */}
+        {userFeedbacks.length > 0 && (
+          <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-center">Your Recent Feedback</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {userFeedbacks.map((feedback, index) => (
+                  <div key={index} className="border-l-4 border-success pl-4 py-2 bg-success/5 rounded-r">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold">Service {feedback.serviceId}</span>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${star <= feedback.rating ? 'fill-warning text-warning' : 'text-muted-foreground'}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground italic">"{feedback.comments}"</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Customer Testimonials */}
         <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">

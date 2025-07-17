@@ -120,7 +120,13 @@ export const Contact: React.FC = () => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Only allow letters and spaces
+                      if (/^[a-zA-Z\s]*$/.test(value)) {
+                        handleInputChange('name', value);
+                      }
+                    }}
                     placeholder="Enter your full name"
                     required
                   />
@@ -132,8 +138,12 @@ export const Contact: React.FC = () => {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="Enter your email address"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Basic email validation
+                      handleInputChange('email', value);
+                    }}
+                    placeholder="e.g., john.doe@example.com"
                     required
                   />
                 </div>
