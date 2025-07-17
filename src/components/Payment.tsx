@@ -25,9 +25,9 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold text-destructive mb-4">No Booking Found</h2>
+              <h2 className="text-3xl font-bold text-destructive mb-4">Book Your Service</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Please complete your service booking first before proceeding to payment.
+                Warning: Please complete your service booking first before proceeding to payment.
               </p>
               <Button 
                 onClick={() => {

@@ -109,20 +109,30 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                   value={formData.contactNumber}
                   onChange={(e) => {
                     let value = e.target.value;
-                    // Remove all non-digit characters except +, -, space, and parentheses
-                    value = value.replace(/[^0-9+\-\s()]/g, '');
+                    // Remove all non-digit characters except +
+                    value = value.replace(/[^0-9+]/g, '');
                     
-                    // Limit to reasonable phone number length
-                    if (value.length <= 17) {
-                      // Auto-format for common patterns
-                      if (value.startsWith('+91') && value.length > 3) {
-                        // Indian format: +91 XXXXX XXXXX
-                        value = value.replace(/(\+91)(\d{5})(\d{5})/, '$1 $2 $3');
-                      } else if (value.startsWith('+1') && value.length > 2) {
-                        // US format: +1 (XXX) XXX-XXXX
-                        value = value.replace(/(\+1)(\d{3})(\d{3})(\d{4})/, '$1 ($2) $3-$4');
+                    // Country-based validation
+                    if (value.startsWith('+91')) {
+                      // India: +91 followed by 10 digits
+                      if (value.length <= 13) {
+                        handleInputChange('contactNumber', value);
                       }
-                      handleInputChange('contactNumber', value);
+                    } else if (value.startsWith('+1')) {
+                      // US/Canada: +1 followed by 10 digits
+                      if (value.length <= 12) {
+                        handleInputChange('contactNumber', value);
+                      }
+                    } else if (value.startsWith('+')) {
+                      // Other countries: limit to 15 total
+                      if (value.length <= 15) {
+                        handleInputChange('contactNumber', value);
+                      }
+                    } else {
+                      // No country code: limit to 10 digits
+                      if (value.length <= 10) {
+                        handleInputChange('contactNumber', value);
+                      }
                     }
                   }}
                   placeholder="e.g., +91 98765 43210 or +1 (555) 123-4567"
@@ -173,8 +183,10 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                     placeholder="Type anything - describe your specific service needs"
                     value={customService}
                     onChange={(e) => {
-                      setCustomService(e.target.value);
-                      handleInputChange('serviceType', `Other: ${e.target.value}`);
+                      const value = e.target.value;
+                      setCustomService(value);
+                      // Update the serviceType with the custom value
+                      handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
                     }}
                     className="mt-2"
                     required
