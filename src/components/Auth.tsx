@@ -132,6 +132,21 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, onRegister, onLogin }
                     </Button>
                   </div>
                 </div>
+                <div className="text-center">
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="text-sm text-primary hover:underline p-0"
+                    onClick={() => {
+                      toast({
+                        title: "Password Reset",
+                        description: "Password reset functionality would typically send an email to your registered address.",
+                      });
+                    }}
+                  >
+                    Forgot Password?
+                  </Button>
+                </div>
                 <Button type="submit" className="w-full">
                   Login
                 </Button>

@@ -103,6 +103,12 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
             description: `Your payment of ₹${(amount / 100).toFixed(2)} has been processed.`,
           });
           
+          // Auto-navigate back to home after 3 seconds
+          setTimeout(() => {
+            const event = new CustomEvent('navigate-to-home');
+            window.dispatchEvent(event);
+          }, 3000);
+          
           return 100;
         }
         return prev + 10;
@@ -162,38 +168,68 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
 
             {/* Payment Method Selection */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Payment Method</h3>
-              <Select onValueChange={setPaymentMethod} value={paymentMethod}>
-                <SelectTrigger>
-                  <SelectValue placeholder="-- Select Method --" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="credit-card">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Credit/Debit Card
+              <h3 className="text-lg font-semibold">Choose Payment Method</h3>
+              <div className="grid grid-cols-1 gap-3">
+                <div 
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === 'upi' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => setPaymentMethod('upi')}
+                >
+                  <div className="flex items-center gap-3">
+                    <Smartphone className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-semibold">UPI Payment</p>
+                      <p className="text-sm text-muted-foreground">Pay using PhonePe, Google Pay, Paytm</p>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="upi">
-                    <div className="flex items-center gap-2">
-                      <Smartphone className="h-4 w-4" />
-                      UPI Payment
+                  </div>
+                </div>
+                
+                <div 
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === 'credit-card' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => setPaymentMethod('credit-card')}
+                >
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-semibold">Credit/Debit Card</p>
+                      <p className="text-sm text-muted-foreground">Visa, Mastercard, RuPay accepted</p>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="net-banking">
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Net Banking
+                  </div>
+                </div>
+                
+                <div 
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === 'net-banking' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => setPaymentMethod('net-banking')}
+                >
+                  <div className="flex items-center gap-3">
+                    <Wallet className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-semibold">Net Banking</p>
+                      <p className="text-sm text-muted-foreground">All major banks supported</p>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="wallet">
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Digital Wallet
+                  </div>
+                </div>
+                
+                <div 
+                  className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === 'wallet' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => setPaymentMethod('wallet')}
+                >
+                  <div className="flex items-center gap-3">
+                    <Wallet className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-semibold">Digital Wallet</p>
+                      <p className="text-sm text-muted-foreground">Paytm, Amazon Pay, MobiKwik</p>
                     </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Processing Animation */}

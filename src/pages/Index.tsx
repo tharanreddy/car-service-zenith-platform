@@ -139,8 +139,15 @@ const Index = () => {
     const handleNavigateToBooking = () => {
       setCurrentPage('book-service');
     };
+    const handleNavigateToHome = () => {
+      setCurrentPage('home');
+    };
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
-    return () => window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
+    window.addEventListener('navigate-to-home', handleNavigateToHome);
+    return () => {
+      window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
+      window.removeEventListener('navigate-to-home', handleNavigateToHome);
+    };
   }, []);
 
   const updateProfileFromBooking = (booking: BookingData) => {
