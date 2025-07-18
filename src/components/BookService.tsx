@@ -103,41 +103,47 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
 
               <div className="space-y-2">
                 <Label htmlFor="contact">Contact Number</Label>
-                <Input
-                  id="contact"
-                  type="tel"
-                  value={formData.contactNumber}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    // Remove all non-digit characters except +
-                    value = value.replace(/[^0-9+]/g, '');
-                    
-                    // Country-based validation
-                    if (value.startsWith('+91')) {
-                      // India: +91 followed by 10 digits
-                      if (value.length <= 13) {
-                        handleInputChange('contactNumber', value);
+                <div className="flex gap-2">
+                  <Select defaultValue="+91" onValueChange={(value) => {
+                    // Update contact number with new country code
+                    const currentNumber = formData.contactNumber.replace(/^(\+\d+\s?)/, '');
+                    handleInputChange('contactNumber', value + ' ' + currentNumber);
+                  }}>
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                      <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                      <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                      <SelectItem value="+61">🇦🇺 +61</SelectItem>
+                      <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                      <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="contact"
+                    type="tel"
+                    className="flex-1"
+                    value={formData.contactNumber.replace(/^(\+\d+\s?)/, '')}
+                    onChange={(e) => {
+                      let value = e.target.value.replace(/\D/g, '');
+                      const countryCode = formData.contactNumber.match(/^(\+\d+)/)?.[1] || '+91';
+                      
+                      // Country-based validation
+                      let maxLength = 10;
+                      if (countryCode === '+1') maxLength = 10;
+                      else if (countryCode === '+44') maxLength = 10;
+                      else if (countryCode === '+91') maxLength = 10;
+                      
+                      if (value.length <= maxLength) {
+                        handleInputChange('contactNumber', countryCode + ' ' + value);
                       }
-                    } else if (value.startsWith('+1')) {
-                      // US/Canada: +1 followed by 10 digits
-                      if (value.length <= 12) {
-                        handleInputChange('contactNumber', value);
-                      }
-                    } else if (value.startsWith('+')) {
-                      // Other countries: limit to 15 total
-                      if (value.length <= 15) {
-                        handleInputChange('contactNumber', value);
-                      }
-                    } else {
-                      // No country code: limit to 10 digits
-                      if (value.length <= 10) {
-                        handleInputChange('contactNumber', value);
-                      }
-                    }
-                  }}
-                  placeholder="e.g., +91 98765 43210 or +1 (555) 123-4567"
-                  required
-                />
+                    }}
+                    placeholder="9876543210"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

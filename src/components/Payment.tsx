@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { CreditCard, Wallet, Smartphone, CheckCircle } from 'lucide-react';
+import { CreditCard, Wallet, Smartphone, CheckCircle, Building } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import type { BookingData } from '@/pages/Index';
 
@@ -50,6 +52,15 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState({
+    upiId: '',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvv: '',
+    cardName: '',
+    bankName: '',
+    walletNumber: ''
+  });
 
   const serviceId = "#SVC" + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
   const amount = getServiceAmount(bookingData?.serviceType || '');
@@ -72,6 +83,37 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
       toast({
         title: "Payment Method Required",
         description: "Please select a payment method.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate payment details based on method
+    let isValid = false;
+    switch (paymentMethod) {
+      case 'upi':
+        isValid = paymentDetails.upiId.length > 0;
+        break;
+      case 'credit-card':
+        isValid = paymentDetails.cardNumber.length === 16 && 
+                 paymentDetails.cardExpiry.length > 0 && 
+                 paymentDetails.cardCvv.length === 3 && 
+                 paymentDetails.cardName.length > 0;
+        break;
+      case 'net-banking':
+        isValid = paymentDetails.bankName.length > 0;
+        break;
+      case 'wallet':
+        isValid = paymentDetails.walletNumber.length > 0;
+        break;
+      default:
+        isValid = false;
+    }
+
+    if (!isValid) {
+      toast({
+        title: "Payment Details Required",
+        description: "Please fill in all payment details.",
         variant: "destructive",
       });
       return;
@@ -207,7 +249,7 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
                   onClick={() => setPaymentMethod('net-banking')}
                 >
                   <div className="flex items-center gap-3">
-                    <Wallet className="h-5 w-5 text-primary" />
+                    <Building className="h-5 w-5 text-primary" />
                     <div>
                       <p className="font-semibold">Net Banking</p>
                       <p className="text-sm text-muted-foreground">All major banks supported</p>
@@ -231,6 +273,127 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
                 </div>
               </div>
             </div>
+
+            {/* Payment Details Forms */}
+            {paymentMethod === 'upi' && (
+              <div className="space-y-4 bg-accent/20 p-4 rounded-lg">
+                <h4 className="font-semibold">UPI Details</h4>
+                <div className="space-y-2">
+                  <Label>UPI ID</Label>
+                  <Input
+                    value={paymentDetails.upiId}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, upiId: e.target.value }))}
+                    placeholder="user@paytm / user@phonepay / user@googlePay"
+                  />
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'credit-card' && (
+              <div className="space-y-4 bg-accent/20 p-4 rounded-lg">
+                <h4 className="font-semibold">Card Details</h4>
+                <div className="space-y-2">
+                  <Label>Card Number</Label>
+                  <Input
+                    value={paymentDetails.cardNumber}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      if (value.length <= 16) {
+                        setPaymentDetails(prev => ({ ...prev, cardNumber: value }));
+                      }
+                    }}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={16}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Expiry Date</Label>
+                    <Input
+                      value={paymentDetails.cardExpiry}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        let formatted = value;
+                        if (value.length >= 2) {
+                          formatted = value.slice(0, 2) + '/' + value.slice(2, 4);
+                        }
+                        if (formatted.length <= 5) {
+                          setPaymentDetails(prev => ({ ...prev, cardExpiry: formatted }));
+                        }
+                      }}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>CVV</Label>
+                    <Input
+                      value={paymentDetails.cardCvv}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        if (value.length <= 3) {
+                          setPaymentDetails(prev => ({ ...prev, cardCvv: value }));
+                        }
+                      }}
+                      placeholder="123"
+                      maxLength={3}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Cardholder Name</Label>
+                  <Input
+                    value={paymentDetails.cardName}
+                    onChange={(e) => setPaymentDetails(prev => ({ ...prev, cardName: e.target.value }))}
+                    placeholder="John Doe"
+                  />
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'net-banking' && (
+              <div className="space-y-4 bg-accent/20 p-4 rounded-lg">
+                <h4 className="font-semibold">Bank Details</h4>
+                <div className="space-y-2">
+                  <Label>Select Bank</Label>
+                  <Select onValueChange={(value) => setPaymentDetails(prev => ({ ...prev, bankName: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose your bank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sbi">State Bank of India</SelectItem>
+                      <SelectItem value="hdfc">HDFC Bank</SelectItem>
+                      <SelectItem value="icici">ICICI Bank</SelectItem>
+                      <SelectItem value="axis">Axis Bank</SelectItem>
+                      <SelectItem value="pnb">Punjab National Bank</SelectItem>
+                      <SelectItem value="boi">Bank of India</SelectItem>
+                      <SelectItem value="canara">Canara Bank</SelectItem>
+                      <SelectItem value="union">Union Bank</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'wallet' && (
+              <div className="space-y-4 bg-accent/20 p-4 rounded-lg">
+                <h4 className="font-semibold">Digital Wallet</h4>
+                <div className="space-y-2">
+                  <Label>Wallet Phone Number</Label>
+                  <Input
+                    value={paymentDetails.walletNumber}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      if (value.length <= 10) {
+                        setPaymentDetails(prev => ({ ...prev, walletNumber: value }));
+                      }
+                    }}
+                    placeholder="9876543210"
+                    maxLength={10}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Processing Animation */}
             {processing && (

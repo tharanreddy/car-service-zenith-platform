@@ -83,10 +83,31 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                   type="tel"
                   value={userProfile.phone}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow numbers and common phone characters
-                    if (/^[0-9+\-\s()]*$/.test(value)) {
-                      handleInputChange('phone', value);
+                    let value = e.target.value;
+                    // Remove all non-digit characters except +
+                    value = value.replace(/[^0-9+]/g, '');
+                    
+                    // Country-based validation
+                    if (value.startsWith('+91')) {
+                      // India: +91 followed by 10 digits
+                      if (value.length <= 13) {
+                        handleInputChange('phone', value);
+                      }
+                    } else if (value.startsWith('+1')) {
+                      // US/Canada: +1 followed by 10 digits
+                      if (value.length <= 12) {
+                        handleInputChange('phone', value);
+                      }
+                    } else if (value.startsWith('+')) {
+                      // Other countries: limit to 15 total
+                      if (value.length <= 15) {
+                        handleInputChange('phone', value);
+                      }
+                    } else {
+                      // No country code: limit to 10 digits
+                      if (value.length <= 10) {
+                        handleInputChange('phone', value);
+                      }
                     }
                   }}
                   placeholder="e.g., +91 9876543210"
