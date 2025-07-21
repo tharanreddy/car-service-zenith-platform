@@ -142,11 +142,16 @@ const Index = () => {
     const handleNavigateToHome = () => {
       setCurrentPage('home');
     };
+    const handleNavigateToFeedback = () => {
+      setCurrentPage('feedback');
+    };
     window.addEventListener('navigate-to-booking', handleNavigateToBooking);
     window.addEventListener('navigate-to-home', handleNavigateToHome);
+    window.addEventListener('navigate-to-feedback', handleNavigateToFeedback);
     return () => {
       window.removeEventListener('navigate-to-booking', handleNavigateToBooking);
       window.removeEventListener('navigate-to-home', handleNavigateToHome);
+      window.removeEventListener('navigate-to-feedback', handleNavigateToFeedback);
     };
   }, []);
 

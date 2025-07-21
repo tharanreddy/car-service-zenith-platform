@@ -145,9 +145,9 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
             description: `Your payment of ₹${(amount / 100).toFixed(2)} has been processed.`,
           });
           
-          // Auto-navigate back to home after 3 seconds
+          // Auto-navigate to feedback after 3 seconds
           setTimeout(() => {
-            const event = new CustomEvent('navigate-to-home');
+            const event = new CustomEvent('navigate-to-feedback');
             window.dispatchEvent(event);
           }, 3000);
           
@@ -173,6 +173,28 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
                 <p className="text-sm text-muted-foreground">Service ID: <span className="font-semibold">{serviceId}</span></p>
                 <p className="text-sm text-muted-foreground">Amount: <span className="font-semibold">₹{(amount / 100).toFixed(2)}</span></p>
               </div>
+              <Button 
+                onClick={() => {
+                  const event = new CustomEvent('navigate-to-booking');
+                  window.dispatchEvent(event);
+                }}
+                variant="default" 
+                size="lg"
+                className="w-full mb-4"
+              >
+                Book Again
+              </Button>
+              <Button 
+                onClick={() => {
+                  const event = new CustomEvent('navigate-to-feedback');
+                  window.dispatchEvent(event);
+                }}
+                variant="outline" 
+                size="lg"
+                className="w-full"
+              >
+                Give Feedback
+              </Button>
             </CardContent>
           </Card>
         </div>

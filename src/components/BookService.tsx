@@ -185,18 +185,20 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                   </SelectContent>
                 </Select>
                 {formData.serviceType === 'Other' && (
-                  <Input
-                    placeholder="Type anything - describe your specific service needs"
-                    value={customService}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setCustomService(value);
-                      // Update the serviceType with the custom value
-                      handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
-                    }}
-                    className="mt-2"
-                    required
-                  />
+                  <div className="mt-2">
+                    <Input
+                      placeholder="Type anything - describe your specific service needs"
+                      value={customService}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setCustomService(value);
+                        // Update the serviceType with the custom value
+                        handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
+                      }}
+                      className="w-full"
+                      required
+                    />
+                  </div>
                 )}
               </div>
 
