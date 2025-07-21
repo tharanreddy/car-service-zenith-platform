@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { db } from '@/lib/firebase'; // adjust this path to your actual firebase config
+import { addDoc, collection } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -169,10 +171,17 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
 
               <div className="space-y-2">
                 <Label>Select Service Type</Label>
-                <Select onValueChange={(value) => {
-                  handleInputChange('serviceType', value);
-                  if (value !== 'Other') setCustomService('');
-                }} required>
+                <Select
+  onValueChange={(value) => {
+    if (value === 'Other') {
+      handleInputChange('serviceType', 'Other'); // Keep this as 'Other' so input stays visible
+    } else {
+      handleInputChange('serviceType', value);
+      setCustomService('');
+    }
+  }}
+  required>
+
                   <SelectTrigger>
                     <SelectValue placeholder="-- Choose Service --" />
                   </SelectTrigger>
@@ -184,22 +193,22 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                     ))}
                   </SelectContent>
                 </Select>
-                {formData.serviceType === 'Other' && (
-                  <div className="mt-2">
-                    <Input
-                      placeholder="Type anything - describe your specific service needs"
-                      value={customService}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setCustomService(value);
-                        // Update the serviceType with the custom value
-                        handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
-                      }}
-                      className="w-full"
-                      required
-                    />
-                  </div>
-                )}
+              {formData.serviceType.startsWith('Other') && (
+  <div className="mt-2">
+    <Input
+      placeholder="Type anything - describe your specific service needs"
+      value={customService}
+      onChange={(e) => {
+        const value = e.target.value;
+        setCustomService(value);
+        // Keep 'Other: [text]' format in the formData
+        handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
+      }}
+      className="w-full"
+      required
+    />
+  </div>
+)}
               </div>
 
               <div className="space-y-2">
