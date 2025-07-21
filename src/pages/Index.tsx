@@ -60,12 +60,21 @@ const Index = () => {
   });
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
-  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(() => {
+    // Load payment status from localStorage
+    const saved = localStorage.getItem('quickcar_payment_completed');
+    return saved ? JSON.parse(saved) : false;
+  });
 
   // Save users to localStorage whenever registeredUsers changes
   React.useEffect(() => {
     localStorage.setItem('quickcar_users', JSON.stringify(registeredUsers));
   }, [registeredUsers]);
+
+  // Save payment status to localStorage whenever it changes
+  React.useEffect(() => {
+    localStorage.setItem('quickcar_payment_completed', JSON.stringify(paymentCompleted));
+  }, [paymentCompleted]);
 
   const handleAuthSuccess = (user: { name: string; email: string }) => {
     setCurrentUserEmail(user.email);
@@ -199,6 +208,29 @@ const Index = () => {
       case 'book-service':
         return <BookService onComplete={updateProfileFromBooking} onNavigate={setCurrentPage} />;
       case 'payments':
+        // Check if there's valid booking data before showing payment
+        if (!bookingData) {
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-warning/10 to-primary/10 py-12">
+              <div className="max-w-2xl mx-auto px-4">
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold text-warning mb-4">No Service Booked</h2>
+                  <p className="text-lg text-muted-foreground mb-6">
+                    Please book a service first before proceeding to payment.
+                  </p>
+                  <Button 
+                    onClick={() => setCurrentPage('book-service')}
+                    variant="default" 
+                    size="lg"
+                    className="w-full"
+                  >
+                    Book Service Now
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        }
         return paymentCompleted ? (
           <div className="min-h-screen bg-gradient-to-br from-success/10 to-primary/10 py-12">
             <div className="max-w-2xl mx-auto px-4">
