@@ -8,6 +8,7 @@ import { Contact } from '@/components/Contact';
 import { Profile } from '@/components/Profile';
 import { Chat } from '@/components/Chat';
 import { Auth } from '@/components/Auth';
+import { Button } from '@/components/ui/button';
 
 export type UserProfile = {
   name: string;
@@ -59,6 +60,7 @@ const Index = () => {
   });
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
 
   // Save users to localStorage whenever registeredUsers changes
   React.useEffect(() => {
@@ -131,6 +133,7 @@ const Index = () => {
     });
     setBookingData(null);
     setPaymentData(null);
+    setPaymentCompleted(false);
     setCurrentPage('home');
   };
 
@@ -157,6 +160,7 @@ const Index = () => {
 
   const updateProfileFromBooking = (booking: BookingData) => {
     setBookingData(booking);
+    setPaymentCompleted(false); // Reset payment status when new booking is made
     const updatedProfile = {
       ...userProfile,
       name: booking.name || userProfile.name,
@@ -195,7 +199,44 @@ const Index = () => {
       case 'book-service':
         return <BookService onComplete={updateProfileFromBooking} onNavigate={setCurrentPage} />;
       case 'payments':
-        return <Payment bookingData={bookingData} onComplete={setPaymentData} />;
+        return paymentCompleted ? (
+          <div className="min-h-screen bg-gradient-to-br from-success/10 to-primary/10 py-12">
+            <div className="max-w-2xl mx-auto px-4">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-success mb-4">Payment Already Completed!</h2>
+                <p className="text-lg text-muted-foreground mb-6">
+                  Your payment has been processed successfully. Book a new service to make another payment.
+                </p>
+                <div className="space-y-4">
+                  <Button 
+                    onClick={() => setCurrentPage('book-service')}
+                    variant="default" 
+                    size="lg"
+                    className="w-full mb-4"
+                  >
+                    Book New Service
+                  </Button>
+                  <Button 
+                    onClick={() => setCurrentPage('feedback')}
+                    variant="outline" 
+                    size="lg"
+                    className="w-full"
+                  >
+                    Give Feedback
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Payment 
+            bookingData={bookingData} 
+            onComplete={(data) => {
+              setPaymentData(data);
+              setPaymentCompleted(true);
+            }} 
+          />
+        );
       case 'feedback':
         return <Feedback />;
       case 'contact':

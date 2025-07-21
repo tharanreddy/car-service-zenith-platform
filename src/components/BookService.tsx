@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { db } from '@/lib/firebase'; // adjust this path to your actual firebase config
-import { addDoc, collection } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
