@@ -10,15 +10,46 @@ import { Chat } from '@/components/Chat';
 import { Auth } from '@/components/Auth';
 import { Button } from '@/components/ui/button';
 
+export type Vehicle = {
+  id: string;
+  make: string;
+  model: string;
+  year: string;
+  licensePlate: string;
+  color: string;
+  mileage: string;
+  isDefault: boolean;
+};
+
+export type ServiceRecord = {
+  id: string;
+  vehicleId: string;
+  serviceType: string;
+  status: 'confirmed' | 'technician-assigned' | 'in-progress' | 'completed' | 'cancelled';
+  amount: number;
+  date: string;
+  time: string;
+  technicianName?: string;
+  technicianPhone?: string;
+  completedAt?: string;
+  rating?: number;
+  feedback?: string;
+  photos?: string[];
+  invoice?: string;
+};
+
 export type UserProfile = {
   name: string;
   email: string;
   phone: string;
   address: string;
-  carMake: string;
-  carModel: string;
-  carYear: string;
-  licensePlate: string;
+  vehicles: Vehicle[];
+  serviceHistory: ServiceRecord[];
+  preferences: {
+    notifications: boolean;
+    reminders: boolean;
+    defaultVehicle?: string;
+  };
 };
 
 export type UserData = {
@@ -30,13 +61,18 @@ export type UserData = {
 };
 
 export type BookingData = {
+  id: string;
   name: string;
   contactNumber: string;
   pickupAddress: string;
-  carModel: string;
+  vehicleId: string;
   serviceType: string;
   preferredDate: string;
   preferredTime: string;
+  photos?: string[];
+  specialInstructions?: string;
+  status: 'pending' | 'confirmed' | 'technician-assigned' | 'in-progress' | 'completed' | 'cancelled';
+  createdAt: string;
 };
 
 const Index = () => {
@@ -53,10 +89,12 @@ const Index = () => {
     email: '',
     phone: '',
     address: '',
-    carMake: '',
-    carModel: '',
-    carYear: '',
-    licensePlate: '',
+    vehicles: [],
+    serviceHistory: [],
+    preferences: {
+      notifications: true,
+      reminders: true,
+    },
   });
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
@@ -88,10 +126,12 @@ const Index = () => {
         email: user.email,
         phone: '',
         address: '',
-        carMake: '',
-        carModel: '',
-        carYear: '',
-        licensePlate: '',
+        vehicles: [],
+        serviceHistory: [],
+        preferences: {
+          notifications: true,
+          reminders: true,
+        },
       });
       setBookingData(null);
       setHasActiveBooking(false);
@@ -109,10 +149,12 @@ const Index = () => {
         email: userData.email,
         phone: '',
         address: '',
-        carMake: '',
-        carModel: '',
-        carYear: '',
-        licensePlate: '',
+        vehicles: [],
+        serviceHistory: [],
+        preferences: {
+          notifications: true,
+          reminders: true,
+        },
       },
       bookingData: null
     };
@@ -136,10 +178,12 @@ const Index = () => {
       email: '',
       phone: '',
       address: '',
-      carMake: '',
-      carModel: '',
-      carYear: '',
-      licensePlate: '',
+      vehicles: [],
+      serviceHistory: [],
+      preferences: {
+        notifications: true,
+        reminders: true,
+      },
     });
     setBookingData(null);
     setPaymentData(null);
@@ -178,7 +222,6 @@ const Index = () => {
       name: booking.name || userProfile.name,
       phone: booking.contactNumber || userProfile.phone,
       address: booking.pickupAddress || userProfile.address,
-      carModel: booking.carModel || userProfile.carModel,
     };
     setUserProfile(updatedProfile);
     
@@ -209,7 +252,7 @@ const Index = () => {
       case 'home':
         return <Hero onNavigate={setCurrentPage} />;
       case 'book-service':
-        return <BookService onComplete={updateProfileFromBooking} onNavigate={setCurrentPage} />;
+        return <BookService onComplete={updateProfileFromBooking} onNavigate={setCurrentPage} userProfile={userProfile} />;
       case 'payments':
         // Only show payment if there's active booking data that hasn't been paid
         if (!hasActiveBooking || !bookingData) {

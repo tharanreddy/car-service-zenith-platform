@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { User, Car, Save } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { User, Save, Settings, History } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { VehicleManagement } from './VehicleManagement';
+import { ServiceHistory } from './ServiceHistory';
 import type { UserProfile } from '@/pages/Index';
 
 interface ProfileProps {
@@ -18,6 +22,16 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
     setUserProfile({ ...userProfile, [field]: value });
   };
 
+  const handlePreferenceChange = (field: keyof UserProfile['preferences'], value: boolean) => {
+    setUserProfile({
+      ...userProfile,
+      preferences: {
+        ...userProfile.preferences,
+        [field]: value,
+      },
+    });
+  };
+
   const handleSave = () => {
     toast({
       title: "Profile Updated!",
@@ -27,163 +41,163 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-warning/10 to-success/10 py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">Your Profile</h1>
           <p className="text-lg text-muted-foreground">
-            Manage your personal information and car details
+            Manage your personal information, vehicles, and service history
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Personal Information */}
-          <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-6 w-6" />
-                Personal Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={userProfile.name}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow letters and spaces
-                    if (/^[a-zA-Z\s]*$/.test(value)) {
-                      handleInputChange('name', value);
-                    }
-                  }}
-                  placeholder="Enter your full name"
-                />
-              </div>
+        <Tabs defaultValue="personal" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="personal">Personal Info</TabsTrigger>
+            <TabsTrigger value="vehicles">My Vehicles</TabsTrigger>
+            <TabsTrigger value="history">Service History</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={userProfile.email}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Basic email validation
-                    handleInputChange('email', value);
-                  }}
-                  placeholder="e.g., john.doe@example.com"
-                />
-              </div>
+          <TabsContent value="personal" className="space-y-6">
+            <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-6 w-6" />
+                  Personal Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      value={userProfile.name}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^[a-zA-Z\s]*$/.test(value)) {
+                          handleInputChange('name', value);
+                        }
+                      }}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Mobile Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={userProfile.phone}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    // Remove all non-digit characters except +
-                    value = value.replace(/[^0-9+]/g, '');
-                    
-                    // Country-based validation
-                    if (value.startsWith('+91')) {
-                      // India: +91 followed by 10 digits
-                      if (value.length <= 13) {
-                        handleInputChange('phone', value);
-                      }
-                    } else if (value.startsWith('+1')) {
-                      // US/Canada: +1 followed by 10 digits
-                      if (value.length <= 12) {
-                        handleInputChange('phone', value);
-                      }
-                    } else if (value.startsWith('+')) {
-                      // Other countries: limit to 15 total
-                      if (value.length <= 15) {
-                        handleInputChange('phone', value);
-                      }
-                    } else {
-                      // No country code: limit to 10 digits
-                      if (value.length <= 10) {
-                        handleInputChange('phone', value);
-                      }
-                    }
-                  }}
-                  placeholder="e.g., +91 9876543210"
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={userProfile.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="e.g., john.doe@example.com"
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  value={userProfile.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  placeholder="123 Main St, Apt 4B, City, State, 12345"
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Mobile Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={userProfile.phone}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        value = value.replace(/[^0-9+]/g, '');
+                        
+                        if (value.startsWith('+91')) {
+                          if (value.length <= 13) {
+                            handleInputChange('phone', value);
+                          }
+                        } else if (value.startsWith('+1')) {
+                          if (value.length <= 12) {
+                            handleInputChange('phone', value);
+                          }
+                        } else if (value.startsWith('+')) {
+                          if (value.length <= 15) {
+                            handleInputChange('phone', value);
+                          }
+                        } else {
+                          if (value.length <= 10) {
+                            handleInputChange('phone', value);
+                          }
+                        }
+                      }}
+                      placeholder="e.g., +91 9876543210"
+                    />
+                  </div>
+                </div>
 
-          {/* Car Details */}
-          <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="h-6 w-6" />
-                Car Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="carMake">Car Make</Label>
-                <Input
-                  id="carMake"
-                  value={userProfile.carMake}
-                  onChange={(e) => handleInputChange('carMake', e.target.value)}
-                  placeholder="Toyota"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea
+                    id="address"
+                    value={userProfile.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    placeholder="123 Main St, Apt 4B, City, State, 12345"
+                    rows={3}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="carModel">Car Model</Label>
-                <Input
-                  id="carModel"
-                  value={userProfile.carModel}
-                  onChange={(e) => handleInputChange('carModel', e.target.value)}
-                  placeholder="Camry"
-                />
-              </div>
+                <Button onClick={handleSave} className="w-full md:w-auto" size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-              <div className="space-y-2">
-                <Label htmlFor="carYear">Car Year</Label>
-                <Input
-                  id="carYear"
-                  value={userProfile.carYear}
-                  onChange={(e) => handleInputChange('carYear', e.target.value)}
-                  placeholder="2020"
-                />
-              </div>
+          <TabsContent value="vehicles">
+            <VehicleManagement userProfile={userProfile} setUserProfile={setUserProfile} />
+          </TabsContent>
 
-              <div className="space-y-2">
-                <Label htmlFor="licensePlate">License Plate</Label>
-                <Input
-                  id="licensePlate"
-                  value={userProfile.licensePlate}
-                  onChange={(e) => handleInputChange('licensePlate', e.target.value)}
-                  placeholder="MH12AB1234"
-                />
-              </div>
+          <TabsContent value="history">
+            <ServiceHistory userProfile={userProfile} setUserProfile={setUserProfile} />
+          </TabsContent>
 
-              <Button onClick={handleSave} className="w-full mt-6" size="lg">
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+          <TabsContent value="settings" className="space-y-6">
+            <Card className="shadow-2xl border-0 bg-card/95 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-6 w-6" />
+                  Preferences
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-medium">Push Notifications</label>
+                      <p className="text-sm text-muted-foreground">
+                        Receive notifications about service updates
+                      </p>
+                    </div>
+                    <Switch
+                      checked={userProfile.preferences.notifications}
+                      onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
+                    />
+                  </div>
 
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-medium">Service Reminders</label>
+                      <p className="text-sm text-muted-foreground">
+                        Get reminders for regular maintenance
+                      </p>
+                    </div>
+                    <Switch
+                      checked={userProfile.preferences.reminders}
+                      onCheckedChange={(checked) => handlePreferenceChange('reminders', checked)}
+                    />
+                  </div>
+                </div>
+
+                <Button onClick={handleSave} className="w-full md:w-auto" size="lg">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Preferences
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
