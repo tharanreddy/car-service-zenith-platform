@@ -60,11 +60,8 @@ const Index = () => {
   });
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [paymentData, setPaymentData] = useState<any>(null);
-  const [paymentCompleted, setPaymentCompleted] = useState(() => {
-    // Load payment status from localStorage
-    const saved = localStorage.getItem('quickcar_payment_completed');
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [hasActiveBooking, setHasActiveBooking] = useState(false);
 
   // Save users to localStorage whenever registeredUsers changes
   React.useEffect(() => {
@@ -82,13 +79,9 @@ const Index = () => {
     const userData = registeredUsers.find(u => u.email === user.email);
     if (userData) {
       setUserProfile(userData.profile);
-      // Only load booking data if payment hasn't been completed
-      const paymentCompleted = localStorage.getItem('quickcar_payment_completed');
-      if (!paymentCompleted || JSON.parse(paymentCompleted) === false) {
-        setBookingData(userData.bookingData);
-      } else {
-        setBookingData(null); // Clear booking data if payment was completed
-      }
+      // Don't load any old booking data on login
+      setBookingData(null);
+      setHasActiveBooking(false);
     } else {
       setUserProfile({
         name: user.name,
@@ -101,6 +94,7 @@ const Index = () => {
         licensePlate: '',
       });
       setBookingData(null);
+      setHasActiveBooking(false);
     }
     setIsAuthenticated(true);
   };
@@ -176,9 +170,8 @@ const Index = () => {
 
   const updateProfileFromBooking = (booking: BookingData) => {
     setBookingData(booking);
-    setPaymentCompleted(false); // Reset payment status when new booking is made
-    // Clear previous payment completion from localStorage
-    localStorage.removeItem('quickcar_payment_completed');
+    setPaymentCompleted(false);
+    setHasActiveBooking(true);
     
     const updatedProfile = {
       ...userProfile,
@@ -218,8 +211,8 @@ const Index = () => {
       case 'book-service':
         return <BookService onComplete={updateProfileFromBooking} onNavigate={setCurrentPage} />;
       case 'payments':
-        // Check if there's valid booking data before showing payment
-        if (!bookingData) {
+        // Only show payment if there's active booking data that hasn't been paid
+        if (!hasActiveBooking || !bookingData) {
           return (
             <div className="min-h-screen bg-gradient-to-br from-warning/10 to-primary/10 py-12">
               <div className="max-w-2xl mx-auto px-4">
@@ -276,6 +269,7 @@ const Index = () => {
             onComplete={(data) => {
               setPaymentData(data);
               setPaymentCompleted(true);
+              setHasActiveBooking(false); // Clear active booking flag
               setBookingData(null); // Clear booking data after payment completion
               // Update user data to clear booking
               setRegisteredUsers(prev => 
@@ -285,7 +279,7 @@ const Index = () => {
                     : user
                 )
               );
-            }} 
+            }}
           />
         );
       case 'feedback':
