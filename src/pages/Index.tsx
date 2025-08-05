@@ -82,7 +82,13 @@ const Index = () => {
     const userData = registeredUsers.find(u => u.email === user.email);
     if (userData) {
       setUserProfile(userData.profile);
-      setBookingData(userData.bookingData);
+      // Only load booking data if payment hasn't been completed
+      const paymentCompleted = localStorage.getItem('quickcar_payment_completed');
+      if (!paymentCompleted || JSON.parse(paymentCompleted) === false) {
+        setBookingData(userData.bookingData);
+      } else {
+        setBookingData(null); // Clear booking data if payment was completed
+      }
     } else {
       setUserProfile({
         name: user.name,
@@ -94,6 +100,7 @@ const Index = () => {
         carYear: '',
         licensePlate: '',
       });
+      setBookingData(null);
     }
     setIsAuthenticated(true);
   };
@@ -170,6 +177,9 @@ const Index = () => {
   const updateProfileFromBooking = (booking: BookingData) => {
     setBookingData(booking);
     setPaymentCompleted(false); // Reset payment status when new booking is made
+    // Clear previous payment completion from localStorage
+    localStorage.removeItem('quickcar_payment_completed');
+    
     const updatedProfile = {
       ...userProfile,
       name: booking.name || userProfile.name,
@@ -266,6 +276,15 @@ const Index = () => {
             onComplete={(data) => {
               setPaymentData(data);
               setPaymentCompleted(true);
+              setBookingData(null); // Clear booking data after payment completion
+              // Update user data to clear booking
+              setRegisteredUsers(prev => 
+                prev.map(user => 
+                  user.email === currentUserEmail 
+                    ? { ...user, bookingData: null }
+                    : user
+                )
+              );
             }} 
           />
         );
