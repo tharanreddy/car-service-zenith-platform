@@ -247,6 +247,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                 {formData.serviceType === 'Other' && (
                   <div className="mt-2">
                     <Input
+                      id="customService"
                       placeholder="Describe your specific service needs"
                       value={customService}
                       onChange={(e) => {
@@ -256,6 +257,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                       }}
                       className="w-full"
                       required
+                      autoFocus
                     />
                   </div>
                 )}

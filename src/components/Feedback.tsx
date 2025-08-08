@@ -196,35 +196,37 @@ export const Feedback: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {allFeedbacks.slice(0, 10).map((item) => (
-                <div key={item.id} className="bg-accent/20 rounded-lg p-4 border border-border/50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Service {item.serviceId}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < item.rating
-                                ? 'fill-warning text-warning'
-                                : 'text-muted-foreground'
-                            }`}
-                          />
-                        ))}
+              <div className="max-h-96 overflow-y-auto pr-2 space-y-4">
+                {allFeedbacks.slice(0, 20).map((item) => (
+                  <div key={item.id} className="bg-accent/20 rounded-lg p-4 border border-border/50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Service {item.serviceId}</span>
                       </div>
-                      <span className="text-sm text-muted-foreground">{item.timestamp}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < item.rating
+                                  ? 'fill-warning text-warning'
+                                  : 'text-muted-foreground'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-muted-foreground">{item.timestamp}</span>
+                      </div>
                     </div>
+                    <p className="text-foreground italic">"{item.comments}"</p>
                   </div>
-                  <p className="text-foreground italic">"{item.comments}"</p>
-                </div>
-              ))}
-              {allFeedbacks.length > 10 && (
+                ))}
+              </div>
+              {allFeedbacks.length > 20 && (
                 <p className="text-center text-sm text-muted-foreground">
-                  Showing latest 10 feedbacks
+                  Showing latest 20 feedbacks • Scroll to see more
                 </p>
               )}
             </CardContent>
