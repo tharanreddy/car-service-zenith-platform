@@ -26,7 +26,7 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
     setUserProfile({
       ...userProfile,
       preferences: {
-        ...userProfile.preferences,
+        ...(userProfile.preferences || { notifications: true, reminders: true }),
         [field]: value,
       },
     });
@@ -171,7 +171,7 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                       </p>
                     </div>
                     <Switch
-                      checked={userProfile.preferences.notifications}
+                      checked={userProfile.preferences?.notifications ?? true}
                       onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
                     />
                   </div>
@@ -184,7 +184,7 @@ export const Profile: React.FC<ProfileProps> = ({ userProfile, setUserProfile })
                       </p>
                     </div>
                     <Switch
-                      checked={userProfile.preferences.reminders}
+                      checked={userProfile.preferences?.reminders ?? true}
                       onCheckedChange={(checked) => handlePreferenceChange('reminders', checked)}
                     />
                   </div>
