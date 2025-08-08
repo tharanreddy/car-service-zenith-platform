@@ -24,7 +24,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
     name: userProfile.name || '',
     contactNumber: userProfile.phone || '',
     pickupAddress: userProfile.address || '',
-    vehicleId: userProfile.vehicles.find(v => v.isDefault)?.id || userProfile.vehicles[0]?.id || '',
+    vehicleId: userProfile.vehicles?.find(v => v.isDefault)?.id || userProfile.vehicles?.[0]?.id || '',
     serviceType: '',
     preferredDate: '',
     preferredTime: '',
@@ -192,7 +192,7 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
 
               <div className="space-y-2">
                 <Label>Select Vehicle</Label>
-                {userProfile.vehicles.length === 0 ? (
+                {!userProfile.vehicles || userProfile.vehicles.length === 0 ? (
                   <div className="p-4 border border-dashed rounded-lg text-center">
                     <p className="text-muted-foreground mb-2">No vehicles found</p>
                     <Button type="button" variant="outline" onClick={() => onNavigate('profile')}>
