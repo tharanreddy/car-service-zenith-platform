@@ -49,8 +49,8 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
     };
 
     let updatedVehicles = editingVehicle
-      ? userProfile.vehicles.map(v => v.id === editingVehicle.id ? vehicleData : v)
-      : [...userProfile.vehicles, vehicleData];
+      ? (userProfile.vehicles || []).map(v => v.id === editingVehicle.id ? vehicleData : v)
+      : [...(userProfile.vehicles || []), vehicleData];
 
     // If this is set as default, remove default from others
     if (vehicleData.isDefault) {
@@ -87,7 +87,7 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
   };
 
   const handleDelete = (vehicleId: string) => {
-    if (userProfile.vehicles.length === 1) {
+    if ((userProfile.vehicles || []).length === 1) {
       toast({
         title: "Cannot Delete",
         description: "You must have at least one vehicle.",
@@ -96,8 +96,8 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
       return;
     }
 
-    const vehicleToDelete = userProfile.vehicles.find(v => v.id === vehicleId);
-    const updatedVehicles = userProfile.vehicles.filter(v => v.id !== vehicleId);
+    const vehicleToDelete = (userProfile.vehicles || []).find(v => v.id === vehicleId);
+    const updatedVehicles = (userProfile.vehicles || []).filter(v => v.id !== vehicleId);
 
     // If deleted vehicle was default, make first remaining vehicle default
     if (vehicleToDelete?.isDefault && updatedVehicles.length > 0) {
@@ -116,7 +116,7 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
   };
 
   const setAsDefault = (vehicleId: string) => {
-    const updatedVehicles = userProfile.vehicles.map(v => ({
+    const updatedVehicles = (userProfile.vehicles || []).map(v => ({
       ...v,
       isDefault: v.id === vehicleId,
     }));
@@ -266,7 +266,7 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
         </div>
       </CardHeader>
       <CardContent>
-        {userProfile.vehicles.length === 0 ? (
+        {(userProfile.vehicles || []).length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Car className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No vehicles added yet</p>
@@ -274,7 +274,7 @@ export const VehicleManagement: React.FC<VehicleManagementProps> = ({ userProfil
           </div>
         ) : (
           <div className="space-y-4">
-            {userProfile.vehicles.map((vehicle) => (
+            {(userProfile.vehicles || []).map((vehicle) => (
               <div
                 key={vehicle.id}
                 className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
