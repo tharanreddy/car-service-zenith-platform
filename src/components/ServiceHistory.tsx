@@ -40,12 +40,12 @@ export const ServiceHistory: React.FC<ServiceHistoryProps> = ({ userProfile, set
   };
 
   const getVehicleName = (vehicleId: string): string => {
-    const vehicle = userProfile.vehicles.find(v => v.id === vehicleId);
+    const vehicle = (userProfile.vehicles || []).find(v => v.id === vehicleId);
     return vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown Vehicle';
   };
 
   const handleCancelBooking = (recordId: string) => {
-    const updatedHistory = userProfile.serviceHistory.map(record =>
+    const updatedHistory = (userProfile.serviceHistory || []).map(record =>
       record.id === recordId ? { ...record, status: 'cancelled' as const } : record
     );
 
@@ -78,7 +78,7 @@ export const ServiceHistory: React.FC<ServiceHistoryProps> = ({ userProfile, set
       return;
     }
 
-    const updatedHistory = userProfile.serviceHistory.map(record =>
+    const updatedHistory = (userProfile.serviceHistory || []).map(record =>
       record.id === selectedRecord.id 
         ? { ...record, rating, feedback }
         : record
@@ -107,7 +107,7 @@ export const ServiceHistory: React.FC<ServiceHistoryProps> = ({ userProfile, set
     });
   };
 
-  const sortedHistory = [...userProfile.serviceHistory].sort((a, b) => 
+  const sortedHistory = [...(userProfile.serviceHistory || [])].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
