@@ -310,18 +310,48 @@ const Index = () => {
           <Payment 
             bookingData={bookingData} 
             onComplete={(data) => {
+              if (bookingData) {
+                // Create service record from booking data
+                const serviceRecord: ServiceRecord = {
+                  id: data.serviceId || Date.now().toString(),
+                  vehicleId: bookingData.vehicleId,
+                  serviceType: bookingData.serviceType,
+                  status: 'confirmed',
+                  amount: data.amount,
+                  date: bookingData.preferredDate || new Date().toISOString().split('T')[0],
+                  time: bookingData.preferredTime || '10:00',
+                  technicianName: 'Service Team',
+                  technicianPhone: '+91 9876543210',
+                  photos: bookingData.photos || [],
+                };
+
+                // Add to user's service history
+                setUserProfile(prev => ({
+                  ...prev,
+                  serviceHistory: [...(prev.serviceHistory || []), serviceRecord],
+                }));
+
+                // Update registered users data
+                setRegisteredUsers(prev => 
+                  prev.map(user => 
+                    user.email === currentUserEmail 
+                      ? { 
+                          ...user, 
+                          bookingData: null,
+                          profile: {
+                            ...user.profile,
+                            serviceHistory: [...(user.profile.serviceHistory || []), serviceRecord],
+                          }
+                        }
+                      : user
+                  )
+                );
+              }
+
               setPaymentData(data);
               setPaymentCompleted(true);
               setHasActiveBooking(false); // Clear active booking flag
               setBookingData(null); // Clear booking data after payment completion
-              // Update user data to clear booking
-              setRegisteredUsers(prev => 
-                prev.map(user => 
-                  user.email === currentUserEmail 
-                    ? { ...user, bookingData: null }
-                    : user
-                )
-              );
             }}
           />
         );
