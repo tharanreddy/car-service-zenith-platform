@@ -223,9 +223,11 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
               <div className="space-y-2">
                 <Label>Select Service Type</Label>
                 <Select
+                  value={formData.serviceType.startsWith('Other') ? 'Other' : formData.serviceType}
                   onValueChange={(value) => {
                     if (value === 'Other') {
                       handleInputChange('serviceType', 'Other');
+                      setCustomService('');
                     } else {
                       handleInputChange('serviceType', value);
                       setCustomService('');
@@ -244,21 +246,28 @@ export const BookService: React.FC<BookServiceProps> = ({ onComplete, onNavigate
                     ))}
                   </SelectContent>
                 </Select>
-                {formData.serviceType === 'Other' && (
-                  <div className="mt-2">
-                    <Input
+                {(formData.serviceType === 'Other' || formData.serviceType.startsWith('Other:')) && (
+                  <div className="mt-3 space-y-2">
+                    <Label htmlFor="customService" className="text-sm font-medium">
+                      Describe your specific service needs
+                    </Label>
+                    <Textarea
                       id="customService"
-                      placeholder="Describe your specific service needs"
+                      placeholder="Please describe your specific service requirements in detail..."
                       value={customService}
                       onChange={(e) => {
                         const value = e.target.value;
                         setCustomService(value);
                         handleInputChange('serviceType', value ? `Other: ${value}` : 'Other');
                       }}
-                      className="w-full"
+                      className="w-full min-h-[80px] resize-none"
                       required
                       autoFocus
+                      rows={3}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Provide as much detail as possible to help us serve you better
+                    </p>
                   </div>
                 )}
               </div>
