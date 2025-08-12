@@ -29,7 +29,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
                   Experience
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-primary-glow to-white bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary-glow via-white to-primary-glow bg-clip-text text-transparent font-extrabold text-shadow drop-shadow-lg">
                   Hassle-Free
                 </span>
                 <br />
@@ -51,9 +51,9 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
                 <span className="relative z-10">Book Your Service Now</span>
               </Button>
               <Button 
-                variant="outline" 
+                variant="default" 
                 size="xl"
-                className="border-white/30 text-white hover:bg-white/10 hover-lift backdrop-blur-sm"
+                className="bg-primary hover:bg-primary-hover text-white hover-lift backdrop-blur-sm shadow-lg"
                 onClick={() => onNavigate('contact')}
               >
                 Learn More
@@ -80,6 +80,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
                   variant="success" 
                   size="lg" 
                   className="rounded-full px-8 shine-effect hover-lift shadow-lg animate-pulse-glow"
+                  onClick={() => onNavigate('book-service')}
                 >
                   <Star className="w-5 h-5 mr-2" />
                   Premium Services
