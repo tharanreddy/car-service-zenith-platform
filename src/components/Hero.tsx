@@ -79,8 +79,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
                 <Button 
                   variant="success" 
                   size="lg" 
-                  className="rounded-full px-8 shine-effect hover-lift shadow-lg animate-pulse-glow"
-                  onClick={() => onNavigate('book-service')}
+                  className="rounded-full px-8 shine-effect hover-lift shadow-lg animate-pulse-glow cursor-default"
+                  disabled
                 >
                   <Star className="w-5 h-5 mr-2" />
                   Premium Services

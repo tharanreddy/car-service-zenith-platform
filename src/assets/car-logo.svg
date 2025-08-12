@@ -1,0 +1,33 @@
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gear -->
+  <g fill="#DC2626">
+    <circle cx="25" cy="25" r="18" fill="none" stroke="#DC2626" stroke-width="3"/>
+    <circle cx="25" cy="25" r="6" fill="#DC2626"/>
+    <!-- Gear teeth -->
+    <rect x="23" y="2" width="4" height="8"/>
+    <rect x="23" y="40" width="4" height="8"/>
+    <rect x="2" y="23" width="8" height="4"/>
+    <rect x="40" y="23" width="8" height="4"/>
+    <rect x="38" y="8" width="4" height="6" transform="rotate(45 40 11)"/>
+    <rect x="8" y="8" width="4" height="6" transform="rotate(-45 10 11)"/>
+    <rect x="38" y="36" width="4" height="6" transform="rotate(-45 40 39)"/>
+    <rect x="8" y="36" width="4" height="6" transform="rotate(45 10 39)"/>
+  </g>
+  
+  <!-- Car silhouette -->
+  <g fill="#DC2626">
+    <!-- Car body -->
+    <path d="M55 35 Q55 30 60 30 L85 30 Q90 30 90 35 L90 45 Q95 45 95 50 L95 55 Q95 60 90 60 L85 60 Q80 60 75 55 L70 55 Q65 60 60 60 L55 60 Q50 60 50 55 L50 50 Q50 45 55 45 Z"/>
+    
+    <!-- Windshield -->
+    <path d="M60 35 L60 30 L80 30 L80 35 Z" fill="none" stroke="#DC2626" stroke-width="1"/>
+    
+    <!-- Wheels -->
+    <circle cx="65" cy="55" r="5" fill="#DC2626"/>
+    <circle cx="80" cy="55" r="5" fill="#DC2626"/>
+    
+    <!-- Wheel details -->
+    <circle cx="65" cy="55" r="2" fill="white"/>
+    <circle cx="80" cy="55" r="2" fill="white"/>
+  </g>
+</svg>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import carLogo from '@/assets/car-logo.svg';
 
 interface NavigationProps {
   currentPage: string;
@@ -26,8 +27,12 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate,
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-3 group">
             <div className="relative">
-              <Car className="h-8 w-8 text-primary transition-transform duration-300 group-hover:scale-110" />
-              <div className="absolute inset-0 h-8 w-8 rounded-full bg-primary/20 animate-pulse-glow opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <img 
+                src={carLogo} 
+                alt="QuickCar Logo" 
+                className="h-10 w-10 transition-transform duration-300 group-hover:scale-110 object-contain"
+              />
+              <div className="absolute inset-0 h-10 w-10 rounded-full bg-primary/20 animate-pulse-glow opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               QuickCar
