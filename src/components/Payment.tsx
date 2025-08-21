@@ -9,6 +9,13 @@ import { CreditCard, Wallet, Smartphone, CheckCircle, Building } from 'lucide-re
 import { toast } from '@/hooks/use-toast';
 import type { BookingData } from '@/pages/Index';
 
+// Extend Window interface to include Razorpay
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 interface PaymentProps {
   bookingData: BookingData | null;
   onComplete: (paymentData: any) => void;
@@ -88,74 +95,147 @@ export const Payment: React.FC<PaymentProps> = ({ bookingData, onComplete }) => 
       return;
     }
 
-    // Validate payment details based on method
-    let isValid = false;
-    switch (paymentMethod) {
-      case 'upi':
-        isValid = paymentDetails.upiId.length > 0;
-        break;
-      case 'credit-card':
-        isValid = paymentDetails.cardNumber.length === 16 && 
-                 paymentDetails.cardExpiry.length > 0 && 
-                 paymentDetails.cardCvv.length === 3 && 
-                 paymentDetails.cardName.length > 0;
-        break;
-      case 'net-banking':
-        isValid = paymentDetails.bankName.length > 0;
-        break;
-      case 'wallet':
-        isValid = paymentDetails.walletNumber.length > 0;
-        break;
-      default:
-        isValid = false;
-    }
+    setProcessing(true);
+    setProgress(20);
 
-    if (!isValid) {
+    try {
+      // Create Razorpay order
+      const response = await fetch('https://boynjyevftdodqnujkdn.supabase.co/functions/v1/razorpay-payment?action=create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount, // Amount in paise
+          currency: 'INR',
+          bookingData: bookingData
+        }),
+      });
+
+      const orderData = await response.json();
+      
+      if (!orderData.success) {
+        throw new Error(orderData.error || 'Failed to create order');
+      }
+
+      setProgress(40);
+
+      // Load Razorpay script if not already loaded
+      if (!window.Razorpay) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+        
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+        });
+      }
+
+      setProgress(60);
+
+      // Configure Razorpay options
+      const options = {
+        key: orderData.order.key,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'Car Service Hub',
+        description: `${bookingData?.serviceType || 'Car Service'} for ${bookingData?.vehicleId || 'Vehicle'}`,
+        order_id: orderData.order.id,
+        prefill: {
+          name: bookingData?.name || '',
+          contact: bookingData?.contactNumber || '',
+        },
+        theme: {
+          color: '#3B82F6'
+        },
+        handler: async function (response: any) {
+          setProgress(80);
+          
+          try {
+            // Verify payment on backend
+            const verifyResponse = await fetch('https://boynjyevftdodqnujkdn.supabase.co/functions/v1/razorpay-payment?action=verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              setProgress(100);
+              setProcessing(false);
+              setCompleted(true);
+              
+              const paymentData = {
+                serviceId,
+                amount: amount / 100,
+                method: 'razorpay',
+                status: 'completed',
+                timestamp: new Date().toISOString(),
+                payment_id: response.razorpay_payment_id,
+                order_id: response.razorpay_order_id,
+              };
+              
+              onComplete(paymentData);
+              
+              toast({
+                title: "Payment Successful!",
+                description: `Your payment of ₹${(amount / 100).toFixed(2)} has been processed.`,
+              });
+              
+              // Auto-navigate to feedback after 3 seconds
+              setTimeout(() => {
+                const event = new CustomEvent('navigate-to-feedback');
+                window.dispatchEvent(event);
+              }, 3000);
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please contact support if amount was debited.",
+              variant: "destructive",
+            });
+            setProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: function() {
+            setProcessing(false);
+            toast({
+              title: "Payment Cancelled",
+              description: "Payment was cancelled by user.",
+              variant: "destructive",
+            });
+          }
+        }
+      };
+
+      setProgress(70);
+
+      // Open Razorpay checkout
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.open();
+
+    } catch (error) {
+      console.error('Payment error:', error);
       toast({
-        title: "Payment Details Required",
-        description: "Please fill in all payment details.",
+        title: "Payment Failed",
+        description: error.message || "An error occurred while processing payment.",
         variant: "destructive",
       });
-      return;
+      setProcessing(false);
     }
-
-    setProcessing(true);
-    setProgress(0);
-
-    // Simulate payment processing
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setProcessing(false);
-          setCompleted(true);
-          
-          const paymentData = {
-            serviceId,
-            amount: amount / 100,
-            method: paymentMethod,
-            status: 'completed',
-            timestamp: new Date().toISOString(),
-          };
-          
-          onComplete(paymentData);
-          
-          toast({
-            title: "Payment Successful!",
-            description: `Your payment of ₹${(amount / 100).toFixed(2)} has been processed.`,
-          });
-          
-          // Auto-navigate to feedback after 3 seconds
-          setTimeout(() => {
-            const event = new CustomEvent('navigate-to-feedback');
-            window.dispatchEvent(event);
-          }, 3000);
-          
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
   };
 
   if (completed) {
