@@ -19,6 +19,8 @@ interface VerifyPaymentRequest {
 }
 
 serve(async (req) => {
+  console.log('Razorpay payment function called:', req.method, req.url);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -32,12 +34,14 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
+    console.log('Action requested:', action);
 
     if (action === 'create-order') {
       return await createRazorpayOrder(req);
     } else if (action === 'verify-payment') {
       return await verifyPayment(req, supabase);
     } else {
+      console.error('Invalid action:', action);
       return new Response(
         JSON.stringify({ error: 'Invalid action' }),
         { 
@@ -49,7 +53,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in razorpay-payment function:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -60,9 +64,12 @@ serve(async (req) => {
 
 async function createRazorpayOrder(req: Request) {
   try {
+    console.log('Creating Razorpay order...');
     const { amount, currency = 'INR', bookingData }: CreateOrderRequest = await req.json();
+    console.log('Request data:', { amount, currency, bookingData });
 
     if (!amount || amount <= 0) {
+      console.error('Invalid amount:', amount);
       return new Response(
         JSON.stringify({ error: 'Invalid amount' }),
         { 
@@ -74,11 +81,16 @@ async function createRazorpayOrder(req: Request) {
 
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID');
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
+    
+    console.log('Checking Razorpay credentials...');
+    console.log('RAZORPAY_KEY_ID exists:', !!razorpayKeyId);
+    console.log('RAZORPAY_KEY_SECRET exists:', !!razorpayKeySecret);
+    console.log('RAZORPAY_KEY_ID value:', razorpayKeyId ? `${razorpayKeyId.substring(0, 10)}...` : 'not set');
 
     if (!razorpayKeyId || !razorpayKeySecret) {
       console.error('Razorpay credentials not found');
       return new Response(
-        JSON.stringify({ error: 'Payment gateway configuration error' }),
+        JSON.stringify({ error: 'Payment gateway configuration error - missing credentials' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -93,7 +105,7 @@ async function createRazorpayOrder(req: Request) {
       notes: {
         service_type: bookingData?.serviceType || 'Car Service',
         customer_name: bookingData?.name || 'Customer',
-        vehicle: bookingData?.vehicle || 'Vehicle'
+        vehicle: bookingData?.vehicleId || 'Vehicle'
       }
     };
 
@@ -111,10 +123,23 @@ async function createRazorpayOrder(req: Request) {
       body: JSON.stringify(orderData),
     });
 
+    console.log('Razorpay API response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Razorpay API error:', response.status, errorText);
-      throw new Error(`Razorpay API error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Razorpay API error',
+          details: errorText,
+          status: response.status
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
     }
 
     const order = await response.json();
@@ -141,7 +166,8 @@ async function createRazorpayOrder(req: Request) {
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: 'Failed to create payment order' 
+        error: 'Failed to create payment order',
+        details: error.message
       }),
       { 
         status: 500, 
